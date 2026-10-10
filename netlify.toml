@@ -1,0 +1,8 @@
+# MOGRA sitesi: Sanity panelindeki içerikten her yayında yeniden üretilir.
+[build]
+  base    = "site"
+  command = "python3 _build/build.py"
+  publish = "."
+
+[build.environment]
+  PYTHON_VERSION = "3.12"
