@@ -37,6 +37,13 @@ def bpath(lang,post): return ("" if lang=="tr" else "en/")+"blog/"+(post["slug"]
 def url(lang,key=None,slug=None): return SITE+"/"+path(lang,key,slug)
 WA_SVG='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5c.2-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.1-.3-.2-.6-.3zM12 2a10 10 0 0 0-8.6 15l-1.4 5 5.2-1.4A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3.1.8.8-3-.2-.3A8.2 8.2 0 1 1 12 20.2z"/></svg>'
 def lo(x): return x.replace("I","ı").replace("İ","i").lower()
+# cümle içi: yalnız ilk harfi küçült; U form, Utah, Texa gibi özel adlar korunur
+def lf(x):
+    w=x.split(" ",1); keep={"U","Utah","Texa"}
+    return x if w[0] in keep else lo(w[0])+(" "+w[1] if len(w)>1 else "")
+def en_surf(d):
+    s=lf(d); return s if s.endswith(("texture","textures","finish")) else s+" finish"
+def an(s): return s if s.endswith("s") else ("an " if s[0].lower() in "aeiou" and not s.startswith("U ") else "a ")+s
 def num(x):
     v=float(x); return (f"{v:.1f}".rstrip("0").rstrip(".")).replace(".",",")
 def num_en(x):
@@ -112,7 +119,7 @@ def hrange(s,lang):
 def cname(c,lang): return c if lang=="tr" else COLOR_EN.get(c,c)
 def swatches(s,lang): return '<span class="swatches">'+"".join(f'<i class="sw" style="background:{SWATCH.get(c,"#ccc")}" title="{E(cname(c,lang))}"></i>' for c in s["colors"])+'</span>'
 for s in SER: s["en_name"]=re.sub(r"\s*/\s*"," / ",s["en_name"]).replace("Tropic / Utah","Tropic Utah")
-T={"tr":dict(top="Mimari projeler ve toptan siparişler için özel fiyatlandırma",top_a="Teklif alın",kol="Koleksiyonlar",mek="Mekanlar",fib="Fiberclay",hak="Hakkımızda",
+T={"tr":dict(top="Mimari projeler ve toptan siparişler için özel fiyatlandırma",top_a="Teklif alın",kol="Koleksiyonlar",mek="Mekânlar",fib="Fiberclay",hak="Hakkımızda",
       mim="Mimari Destek",kat="Katalog",ilet="İletişim",all="Tüm seriler →",mega_p="{n} seri, fiberclay. İç ve dış mekân için.",
       foot="MOGRA, Serinova'nın fiberclay saksı markasıdır. 1986'dan bu yana İstanbul'da üretim yapan Serinova'nın deneyimiyle mimari projeler, oteller ve yaşam alanları için tasarlanır.",
       f_kur="Kurumsal",f_pop="Popüler Seriler",f_all="Tüm Seriler",f_mat="Fiberclay Malzeme",f_kat="Katalog 2026",wa="WhatsApp ile yazın",open="Menüyü aç",close="Menüyü kapat",
@@ -160,7 +167,7 @@ def layout(lang,me,other,title,desc,body,hero=False,cur="",og="img/hero/mogra-an
 <link rel="canonical" href="{canon}"><link rel="alternate" hreflang="tr" href="{tr_url}"><link rel="alternate" hreflang="en" href="{en_url}"><link rel="alternate" hreflang="x-default" href="{tr_url}">
 <meta property="og:type" content="website"><meta property="og:site_name" content="MOGRA"><meta property="og:title" content="{E(title)}"><meta property="og:description" content="{E(desc)}"><meta property="og:url" content="{canon}">
 <meta property="og:image" content="{SITE}/{og}"><meta property="og:locale" content="{"tr_TR" if lang=="tr" else "en_US"}"><meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#C97C5F"><link rel="icon" type="image/png" href="{pre}img/brand/mogra-mark.png"><link rel="apple-touch-icon" href="{pre}img/brand/mogra-mark.png">
+<meta name="theme-color" content="#C97C5F"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="192x192" href="{pre}img/brand/favicon-192.png"><link rel="apple-touch-icon" href="{pre}img/brand/favicon-192.png">
 <link rel="preload" href="{pre}fonts/Nexa-XBold.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="{pre}assets/style.css?v={ASSET_V}">{head}{ga}
 </head><body class="{"has-hero" if hero else ""}">
 <div class="topbar">{t["top"]} · <a href="{P("mim")}">{t["top_a"]}</a></div>
@@ -235,7 +242,7 @@ def index(lang):
 <section class="sec"><div class="wrap"><div class="sec-head"><div><span class="eyebrow">{X("Öne çıkanlar","Featured")}</span><h2>{X("Seriler","Series")}</h2></div><div class="rail-nav" data-rail="rail1"><button type="button" data-dir="-1" aria-label="←">←</button><button type="button" data-dir="1" aria-label="→">→</button></div></div><div class="rail" id="rail1">{rail}</div><p style="margin-top:28px"><a class="link-arrow" href="{P("kol")}">{X(f"Tüm {len(SER)} seriyi gör →",f"See all {len(SER)} series →")}</a></p></div></section>
 {kat_band}
 {story("kale",X("Doku","Texture"),X("Taş, tuğla, volkan. Yüzeyde karakter.","Stone, brick, volcano. Character in the surface."),X("Kale'nin tuğla dokusu, Terra'nın Utah yüzeyi, Çana'nın volkan dokusu. Fiberclay, doğal taşın görünümünü hafif ve dayanıklı bir gövdede verir.","Kale's brick texture, Terra's Utah surface, Çana's volcano finish. Fiberclay gives the look of natural stone in a light, durable body."),["terra","cana","merkur"],"img/kale/kale-lifestyle2.jpg",True)}
-<section class="sec" id="mekanlar"><div class="wrap"><div class="sec-head"><div><span class="eyebrow">{X("Mekanlar","Spaces")}</span><h2>{X("MOGRA mekânda.","MOGRA in place.")}</h2></div><p>{X("Otel lobisinden ev salonuna, restoran terasından ofis girişine.","From hotel lobbies to living rooms, restaurant terraces to office entrances.")}</p></div><div class="spaces">{spaces}</div></div></section>
+<section class="sec" id="mekanlar"><div class="wrap"><div class="sec-head"><div><span class="eyebrow">{X("Mekânlar","Spaces")}</span><h2>{X("MOGRA mekânda.","MOGRA in place.")}</h2></div><p>{X("Otel lobisinden ev salonuna, restoran terasından ofis girişine.","From hotel lobbies to living rooms, restaurant terraces to office entrances.")}</p></div><div class="spaces">{spaces}</div></div></section>
 <section class="sec stone"><div class="wrap material"><div><span class="eyebrow">{X("Malzeme","Material")}</span><h2>{X("Neden fiberclay?","Why fiberclay?")}</h2><p>{X("Fiberclay, kil ile cam elyafının birleşiminden oluşan kompozit bir malzemedir. Toprak ve taş saksıların görünümünü taşır, onlardan çok daha hafiftir ve dış mekân koşullarına dayanır.","Fiberclay is a composite of clay and glass fibre. It has the look of terracotta and stone planters, weighs far less and stands up to outdoor conditions.")}</p><p style="margin-top:24px"><a class="link-arrow" href="{P("fib")}">{X("Malzemeyi tanıyın →","About the material →")}</a></p></div><div class="feats">{fe}</div></div></section>
 <section class="sec"><div class="wrap"><div class="sec-head"><div><span class="eyebrow">{X("Sayılarla","In numbers")}</span><h2>{X("MOGRA ve Serinova","MOGRA and Serinova")}</h2></div></div><div class="numbers"><div><b>1986</b><span>{X("Serinova'nın İstanbul'da üretime başladığı yıl","The year Serinova began manufacturing in Istanbul")}</span></div><div><b>90<i>+</i></b><span>{X("Serinova ürünlerinin ulaştığı ülke","Countries Serinova products reach")}</span></div><div><b>{len(SER)}</b><span>{X("MOGRA fiberclay seri","MOGRA fiberclay series")}</span></div><div><b>{nsize}</b><span>{X("boy ve renk seçeneği","size and colour options")}</span></div></div></div></section>
 <section class="cta"><img src="{pre}img/uranium/uranium-lifestyle.jpg" alt="" loading="lazy"><div class="wrap"><span class="eyebrow" style="color:#fff">{T[lang]["mim"]}</span><h2>{X("Projeniz için ölçü, renk ve adet planı.","Sizes, colours and quantities planned for your project.")}</h2><p>{X("Mimarlar, peyzaj tasarımcıları, oteller ve kurumsal alanlar için proje bazlı fiyatlandırma, numune ve sevkiyat planı hazırlıyoruz.","For architects, landscape designers, hotels and commercial spaces we prepare project pricing, samples and delivery plans.")}</p><div class="row" style="display:flex;gap:12px;flex-wrap:wrap"><a class="btn btn-fill" href="{P("mim")}">{X("Teklif isteyin","Request a quote")}</a><a class="btn btn-light" href="{pre}katalog/MOGRA_Katalog_2026.pdf" target="_blank" rel="noopener">{X("Kataloğu indirin","Download the catalogue")}</a></div></div></section>'''
@@ -258,7 +265,7 @@ def seri(s,lang):
     thumbs=[t+("",) for t in thumbs]
     thumbs+=[(x["src"],x["color"],True,f'{N} {x["size"]} · {cname(x["color"],lang)}'+(f' {x["tex"]}' if x["tex"] else "")+X(" mekânda"," in a space"),str(x["size"])) for x in newl]
     if not newl: thumbs+=[(l,"",True,X(f"{N} mekânda",f"{N} in a space"),"") for l in s["life"]]
-    th="".join(f'<button type="button" data-src="{pre}{a}" data-color="{E(c)}" data-size="{sz}" data-alt="MOGRA {E(lab)}"{" data-life=1" if lf else ""} aria-current="{"true" if i==0 else "false"}" aria-label="{E(lab)}" title="{E(lab)}"><img class="{"" if lf else "c"}" src="{pre}{a}" alt="" loading="lazy"></button>' for i,(a,c,lf,lab,sz) in enumerate(thumbs))
+    th="".join(f'<button type="button" data-src="{pre}{a}" data-color="{E(c)}" data-size="{sz}" data-alt="MOGRA {E(lab)}"{" data-life=1" if lf else ""} aria-current="{"true" if i==0 else "false"}" aria-label="{E(lab)}" title="{E(lab)}"><img class="{"" if lf else "c"}" src="{pre}{a}" alt="MOGRA {E(lab)}" loading="lazy"></button>' for i,(a,c,lf,lab,sz) in enumerate(thumbs))
     first=thumbs[0]
     cols="".join(f'<button type="button" data-color="{E(c)}" aria-pressed="{"true" if i==0 else "false"}"><i class="sw" style="background:{SWATCH.get(c,"#ccc")}"></i>{E(cname(c,lang))}</button>' for i,c in enumerate(s["colors"]))
     box=s["sizes"][0][0]=="b"
@@ -271,8 +278,8 @@ def seri(s,lang):
         use=t.get("use") or GEN[lang]["use"]
         guide=[(fmt_size(z,lang),g) for z,g in zip(s["sizes"],s["guide"]) if g]
     else:
-        lead=f'{L["kisa"]} MOGRA {N} is a {lo(L["form"])} planter with a {lo(L["doku"])} surface, made from fiberclay.'
-        desc=[f'MOGRA {N} ({s["en_name"]}) combines a {lo(L["form"])} with a {lo(L["doku"])} surface. {L["kisa"]}',
+        lead=f'{L["kisa"]} MOGRA {N} is {an(lf(L["form"]))} planter with {an(en_surf(L["doku"]))}, made from fiberclay.'
+        desc=[f'MOGRA {N} ({s["en_name"]}) combines {an(lf(L["form"]))} with {an(en_surf(L["doku"]))}. {L["kisa"]}',
               "Fiberclay is a composite of clay and glass fibre. It has the look of terracotta and natural stone, weighs far less than concrete planters, and resists frost, UV and rain, so it can be used indoors and outdoors for years.",
               f'The {N} series comes in {len(s["sizes"])} size{"s" if len(s["sizes"])>1 else ""} and {len(s["colors"])} colour{"s" if len(s["colors"])>1 else ""} ({", ".join(cname(c,lang) for c in s["colors"])}), to be used on its own or grouped in different sizes. We offer project pricing for architects, hotels, landscape designers and trade buyers.']
         tek=[L["form"],L["doku"]]+GEN[lang]["tek"]; use=GEN[lang]["use"]; guide=[]
@@ -302,9 +309,10 @@ def seri(s,lang):
           "image":imgs,"url":SITE+"/"+me,"color":[cname(c,lang) for c in s["colors"]],"countryOfOrigin":"TR",
           "additionalProperty":[{"@type":"PropertyValue","name":X("Ölçü","Size"),"value":fmt_size(z,lang)+" cm"} for z in s["sizes"]]}
     head=ld(prod)+crumbs(lang,[("MOGRA",SITE+"/"+path(lang,"index")),(X("Koleksiyon","Collection"),SITE+"/"+path(lang,"kol")),(N,SITE+"/"+me)])
-    title=X(f'MOGRA {N} Fiberclay Saksı | {L["form"]}, {L["doku"]}',f'MOGRA {N} Fiberclay Planter | {L["form"]}, {L["doku"]}')
-    d=X(f'MOGRA {N}: {lo(L["form"])}, {lo(L["doku"])} fiberclay saksı. {hrange(s,lang)}, {", ".join(s["colors"])}. Hafif, dona ve UV\'ye dayanıklı; iç ve dış mekân. Proje teklifi.',
-        f'MOGRA {N}: {lo(L["form"])} fiberclay planter with {lo(L["doku"])}. {hrange(s,lang)}, {", ".join(cname(c,lang) for c in s["colors"])}. Lightweight, frost and UV resistant. Project pricing.')
+    base_t=X(f'MOGRA {N} Fiberclay Saksı',f'MOGRA {N} Fiberclay Planter')
+    title=next(t for t in [f'{base_t} | {L["form"]}, {L["doku"]}',f'{base_t} | {L["form"]}',base_t] if len(t)<=60 or t==base_t)
+    d=X(f'MOGRA {N}: {lf(L["form"])}, {lf(L["doku"])} fiberclay saksı. {hrange(s,lang)}, {", ".join(s["colors"])}. Hafif, dona ve UV\'ye dayanıklı; iç ve dış mekân. Proje teklifi.',
+        f'MOGRA {N}: {lf(L["form"])} fiberclay planter, {en_surf(L["doku"])}. {hrange(s,lang)}, {", ".join(cname(c,lang) for c in s["colors"])}. Lightweight, frost and UV resistant. Project pricing.')
     og=s.get("hero") or (s["life"] or [s["prod"][0]["src"]])[0]
     return me,layout(lang,me,other,title,d,body,cur="kol",og=og,head=head)
 
@@ -460,9 +468,11 @@ def blog_post(b,lang):
          "author":{"@type":"Organization","name":"MOGRA"},"publisher":{"@type":"Organization","name":"MOGRA","logo":{"@type":"ImageObject","url":SITE+"/img/brand/mogra-mark.png"}},"mainEntityOfPage":SITE+"/"+me}
     return me,layout(lang,me,other,c["title"]+" | MOGRA",c["desc"],body,cur="blog",og=b["img"],head=ld(art)+crumbs(lang,[("MOGRA",SITE+"/"+path(lang,"index")),("Blog",SITE+"/"+path(lang,"blog")),(c["title"],SITE+"/"+me)]))
 
+# Netlify linkleri uzantısız sunuyor; canonical, hreflang, og:url, JSON-LD ve sitemap da aynı adresi göstersin
+def pretty(c): return re.sub(r'(https://mogra\.com\.tr/(?:[^"\s<>]*/)?)index\.html',r'\1',re.sub(r'(https://mogra\.com\.tr/[^"\s<>]*?[^/"\s<>])(?<!/index)\.html(?=["<\s#?])',r'\1',c))
 def W(p,c):
     f=OUT+"/"+(p if p and not p.endswith("/") else p+"index.html")
-    os.makedirs(os.path.dirname(f),exist_ok=True); open(f,"w",encoding="utf-8").write(c)
+    os.makedirs(os.path.dirname(f),exist_ok=True); open(f,"w",encoding="utf-8").write(pretty(c))
 pages=[]
 for lang in ["tr","en"]:
     for fn in [index,koleksiyon,hakkimizda,fiberclay,mimari,iletisim,sss,magaza,blog_index]:
@@ -490,8 +500,8 @@ xs=[]
 for p in pages:
     trp,en=alt(p)
     xs.append(f'<url><loc>{SITE}/{p}</loc><xhtml:link rel="alternate" hreflang="tr" href="{SITE}/{trp}"/><xhtml:link rel="alternate" hreflang="en" href="{SITE}/{en}"/><xhtml:link rel="alternate" hreflang="x-default" href="{SITE}/{trp}"/></url>')
-open(OUT+"/sitemap.xml","w").write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'+"\n".join(xs)+"\n</urlset>\n")
+open(OUT+"/sitemap.xml","w").write(pretty('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'+"\n".join(xs)+"\n</urlset>\n"))
 open(OUT+"/robots.txt","w").write(f"User-agent: *\nAllow: /\nSitemap: {SITE}/sitemap.xml\n")
 open(OUT+"/_headers","w").write("/img/*\n  Cache-Control: public, max-age=2592000\n/fonts/*\n  Cache-Control: public, max-age=31536000, immutable\n/assets/*\n  Cache-Control: public, max-age=86400\n/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n")
-open(OUT+"/_redirects","w").write("https://www.mogra.com.tr/* https://mogra.com.tr/:splat 301!\n")
+open(OUT+"/_redirects","w").write("https://www.mogra.com.tr/* https://mogra.com.tr/:splat 301!\nhttp://www.mogra.com.tr/* https://mogra.com.tr/:splat 301!\n")
 print("ok",len(pages),"sayfa")
