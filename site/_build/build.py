@@ -165,10 +165,10 @@ def layout(lang,me,other,title,desc,body,hero=False,cur="",og="img/hero/mogra-an
 </head><body class="{"has-hero" if hero else ""}">
 <div class="topbar">{t["top"]} · <a href="{P("mim")}">{t["top_a"]}</a></div>
 <header class="hdr"><div class="hdr-in">
-<nav class="nav nav-l" aria-label="Menü"><button type="button" data-mega aria-expanded="false"{ac("kol")}>{t["kol"]}</button><a href="{P("index")}#mekanlar">{t["mek"]}</a><a href="{P("fib")}"{ac("fib")}>{t["fib"]}</a><a href="{P("hak")}"{ac("hak")}>{t["hak"]}</a><a href="https://www.serinovashop.com" target="_blank" rel="noopener">{t["shop"]}</a></nav>
+<nav class="nav nav-l" aria-label="Menü"><button type="button" data-mega aria-expanded="false"{ac("kol")}>{t["kol"]}</button><a href="{P("index")}#mekanlar">{t["mek"]}</a><a href="{P("fib")}"{ac("fib")}>{t["fib"]}</a><a href="{P("hak")}"{ac("hak")}>{t["hak"]}</a></nav>
 <button class="burger" type="button" data-drawer aria-label="{t["open"]}"><span></span></button>
 <a class="logo-wrap" href="{P("index") or "./"}" aria-label="MOGRA"><img class="mark" src="{pre}img/brand/mogra-mark.png" alt="mogra." width="54" height="51"></a>
-<nav class="nav nav-r" aria-label="{t["ilet"]}"><a class="hide-m" href="{P("mim")}"{ac("mim")}>{t["mim"]}</a><a class="hide-m" href="{kat}" target="_blank" rel="noopener">{t["kat"]}</a><a class="hide-m" href="{P("ilet")}"{ac("ilet")}>{t["ilet"]}</a><a href="{other_href}" hreflang="{"en" if lang=="tr" else "tr"}" lang="{"en" if lang=="tr" else "tr"}" title="{t["lang_other_name"]}">{t["lang_other"]}</a><a class="wa" href="https://wa.me/{WA}" target="_blank" rel="noopener" aria-label="WhatsApp">{WA_SVG}</a></nav>
+<nav class="nav nav-r" aria-label="{t["ilet"]}"><a class="hide-m" href="{P("mim")}"{ac("mim")}>{t["mim"]}</a><a class="hide-m" href="{kat}" target="_blank" rel="noopener">{t["kat"]}</a><a class="hide-m" href="{P("ilet")}"{ac("ilet")}>{t["ilet"]}</a><a href="{other_href}" hreflang="{"en" if lang=="tr" else "tr"}" lang="{"en" if lang=="tr" else "tr"}" title="{t["lang_other_name"]}">{t["lang_other"]}</a><a class="wa" href="https://wa.me/{WA}" target="_blank" rel="noopener" aria-label="WhatsApp">{WA_SVG}</a><a class="hide-m nav-shop" href="https://www.serinovashop.com" target="_blank" rel="noopener">{t["shop"]}</a></nav>
 </div>
 <div class="mega" hidden><div class="mega-in"><div class="mega-side"><h4>{t["kol"]}</h4><p>{t["mega_p"].format(n=len(SER))}</p><a class="link-arrow" href="{P("kol")}">{t["all"]}</a></div><div class="mega-groups">{groups}</div></div></div>
 </header>
