@@ -308,7 +308,8 @@ def seri(s,lang):
           "manufacturer":{"@type":"Organization","name":"Serinova Plastik"},"material":"Fiberclay","category":X("Fiberclay saksı","Fiberclay planter"),
           "image":imgs,"url":SITE+"/"+me,"color":[cname(c,lang) for c in s["colors"]],"countryOfOrigin":"TR",
           "additionalProperty":[{"@type":"PropertyValue","name":X("Ölçü","Size"),"value":fmt_size(z,lang)+" cm"} for z in s["sizes"]]}
-    head=ld(prod)+crumbs(lang,[("MOGRA",SITE+"/"+path(lang,"index")),(X("Koleksiyon","Collection"),SITE+"/"+path(lang,"kol")),(N,SITE+"/"+me)])
+    # Product şeması fiyat (offers) olmadan Google'da "geçersiz ürün" hatası veriyor; fiyat eklenene kadar yalnız breadcrumb
+    head=crumbs(lang,[("MOGRA",SITE+"/"+path(lang,"index")),(X("Koleksiyon","Collection"),SITE+"/"+path(lang,"kol")),(N,SITE+"/"+me)])
     base_t=X(f'MOGRA {N} Fiberclay Saksı',f'MOGRA {N} Fiberclay Planter')
     title=next(t for t in [f'{base_t} | {L["form"]}, {L["doku"]}',f'{base_t} | {L["form"]}',base_t] if len(t)<=60 or t==base_t)
     d=X(f'MOGRA {N}: {lf(L["form"])}, {lf(L["doku"])} fiberclay saksı. {hrange(s,lang)}, {", ".join(s["colors"])}. Hafif, dona ve UV\'ye dayanıklı; iç ve dış mekân. Proje teklifi.',
